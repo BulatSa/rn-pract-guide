@@ -1,5 +1,8 @@
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, TextInput, View, Button} from 'react-native';
+import ListItem from './src/components/list-item/list-item';
+import PlaceList from "./src/components/place-list/place-list";
+import PlaceInput from "./src/components/place-input/place-input";
 
 const instructions = Platform.select({
 	ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -11,52 +14,23 @@ const instructions = Platform.select({
 export default class App extends Component {
 
 	state = {
-		placeName: '',
 		places: []
 	};
 
-	placeNameChangedHandler = (val) => {
-		this.setState({
-			placeName: val
-		});
-	};
-
-	placeSubmitHandler = () => {
-		if (this.state.placeName.trim() === '') {
-			return;
-		}
-
+	placeAddedHandler = (placeName) => {
 		this.setState(prevState => {
 			return {
-				places: prevState.places.concat(prevState.placeName)
-			};
+				places: prevState.places.concat(placeName)
+			}
 		});
 	};
 
 	render() {
 
-		const placesOutput = this.state.places.map((place, i) => (
-			<Text key={i}>{place}</Text>
-		));
-
 		return (
 			<View style={styles.container}>
-				<View style={styles.inputContiner}>
-					<TextInput
-						style={styles.placeInput}
-						placeholder={'Awesome placeholder'}
-						value={this.state.placeName}
-						onChangeText={this.placeNameChangedHandler}
-					/>
-					<Button
-						style={styles.placeButton}
-						title='Add'
-						onPress={this.placeSubmitHandler}
-					/>
-				</View>
-				<View>
-					{placesOutput}
-				</View>
+				<PlaceInput onPlaceAdded={this.placeAddedHandler}/>
+				<PlaceList places={this.state.places}/>
 			</View>
 		);
 	}
@@ -69,19 +43,5 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 26,
 		backgroundColor: '#F5FCFF',
-	},
-	inputContiner: {
-		width: '100%',
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between'
-	},
-	placeInput: {
-		width: '70%',
-		borderWidth: 1,
-		borderColor: '#000'
-	},
-	placeButton: {
-		width: '30%'
 	}
 });
