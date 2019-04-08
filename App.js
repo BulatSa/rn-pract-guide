@@ -1,21 +1,25 @@
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, TextInput, View, Button} from 'react-native';
-import ListItem from './src/components/list-item/list-item';
+
 import PlaceList from "./src/components/place-list/place-list";
 import PlaceInput from "./src/components/place-input/place-input";
-import placeImage from './src/assets/place.jpg';
+import PlaceDetail from './src/components/place-detail/place-detail'
 
-const instructions = Platform.select({
-	ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-	android:
-		'Double tap R on your keyboard to reload,\n' +
-		'Shake or press menu button for dev menu',
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		justifyContent: 'flex-start',
+		alignItems: 'center',
+		padding: 26,
+		backgroundColor: '#F5FCFF',
+	}
 });
 
 export default class App extends Component {
 
 	state = {
-		places: []
+		places: [],
+		selectedPlace: null
 	};
 
 	placeAddedHandler = (placeName) => {
@@ -32,32 +36,49 @@ export default class App extends Component {
 		});
 	};
 
-	placeDeletedHandler = (key) => {
+	placeDeletedHandler = () => {
 		this.setState( (prevState) => {
 			return {
 				places: prevState.places.filter((place) => {
-					return place.key !== key;
-				})
+					return place.key !== prevState.selectedPlace.key;
+				}),
+				selectedPlace: null
 			};
+		});
+	};
+
+	modalClosedHandler = () => {
+		this.setState({
+			selectedPlace: null
+		});
+	};
+
+	placeSelectedHandler = (key) => {
+		this.setState((prevState) => {
+			return {
+				selectedPlace: prevState.places.find((place) => {
+					return place.key === key;
+				})
+			}
 		});
 	};
 
 	render() {
 		return (
 			<View style={styles.container}>
+				<PlaceDetail
+					selectedPlace={this.state.selectedPlace}
+					onItemDeleted={this.placeDeletedHandler}
+					onModalClosed={this.modalClosedHandler}
+				/>
 				<PlaceInput onPlaceAdded={this.placeAddedHandler}/>
-				<PlaceList places={this.state.places} onItemDeleted={this.placeDeletedHandler} />
+				<PlaceList
+					places={this.state.places}
+					onItemSelected={this.placeSelectedHandler}
+				/>
 			</View>
 		);
 	}
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		justifyContent: 'flex-start',
-		alignItems: 'center',
-		padding: 26,
-		backgroundColor: '#F5FCFF',
-	}
-});
+
